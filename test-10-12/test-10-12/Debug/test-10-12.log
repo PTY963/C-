@@ -1,2 +1,2 @@
-﻿  test.cpp
-D:\CPP\test-10-12\test-10-12\test.cpp(22): error C4716: “Date::operator==”: 必须返回一个值
+﻿  Date.cpp
+  test-10-12.vcxproj -> D:\CPP\test-10-12\Debug\test-10-12.exe
