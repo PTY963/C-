@@ -3,5 +3,5 @@
 
 int main()
 {
-	zsj::TestString();
+	zsj::TestString7();
 }

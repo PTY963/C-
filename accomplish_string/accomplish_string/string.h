@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <assert.h>
 using namespace std;
 //深浅拷贝
 
@@ -122,8 +123,28 @@ namespace zsj
 	class string
 	{
 	public:
+		typedef char* interator;
+		typedef const char* const_interator;
+		interator begin()
+		{
+			return _str;
+		}
+		interator end()
+		{
+			return _str + _size;
+		}
+
+		const_interator begin() const
+		{
+			return _str;
+		}
+		const_interator end() const
+		{
+			return _str + _size;
+		}
+
 		//构造函数
-		string(char* str)
+		string(const char* str =(char*) "") 
 			:_size(strlen(str))
 			, _capacity(_size)
 		{
@@ -131,95 +152,204 @@ namespace zsj
 			strcpy(_str, str);
 		}
 
-		//拷贝构造函数 - 现实深拷贝
-		/*string(const string& s)
-			:_str(new char[strlen(s._str) + 1])
-			, _size(strlen(_str))
-		    ,_capacity( _size)
-		{
-			strcpy(_str, s._str);
-		}*/
-		//拷贝构造 - 现代简化深拷贝
+		
 		string(const string& s)
 		{
 			string tmp(s._str);
-			swap(_str, tmp._str);
+			swap(tmp);
 		}
-
-		//赋值重载 - 深拷贝
-		//string& operator=(const string& s)
-		//{
-		//	//1、将_str所指向的空间释放掉
-		//	delete[] _str;
-		//	//2、开辟一块和s._str一样大小的空间
-		//	_str = new char[strlen(s._str) + 1];
-		//	//3、将s._str所指向的内容拷贝给_str
-		//	strcpy(_str, s._str);
-
-		//	return *this;
-		//}
-		//但是上面的程序是有问题的
-		//假设new一块空间失败，新空间不仅没有生成，_str原先指向的空间也被释放掉了
-		//string& operator=(const string& s)
-		//{
-		//	//先开辟一块空间存放在临时指针变量tmp中，假设new失败，就会抛出异常
-		//	char* tmp = new char[strlen(s._str) + 1];
-		//	delete[] _str;
-		//	strcpy(tmp, s._str);
-		//	_str = tmp;
-
-		//	return *this;
-		//}
-
-		//现代写法的赋值重载
-		//tmp作为临时对象,tmp._str和_str交换之后，_str原先的内容被tmp._str指向着
-		//tmp一旦出了作用域生命周期就结束了，_str原先的空间也就销毁了
-		//
-		/*string& operator=(const string& s)
-		{
-			string tmp(s);
-			swap(_str, tmp._str);
-		}*/
 
 		string& operator=(string s)
 		{
-			swap(_str, s._str);
+			swap(s);
 			return *this;
 		}
 
-
+		
+		//增容，在原先的基础上增容
 		void reverse(size_t capacity)
 		{
-			if (_capacity < capacity)
+			if (capacity > _capacity)
 			{
-				_str = new char[2 * capacity];
+				char* tmp = new char[capacity + 1];
+				strcpy(tmp, _str);
+				delete[] _str;
+				_str = tmp;
+				_capacity = capacity;
 			}
-			
 		}
+
+		
 		//尾插一个字符
-		void push_back(char ch)
+		/*void push_back(char ch)
 		{
-			if (_size + 1 >= _capacity)
+			if (_size >= _capacity)
 			{
-				reverse(2 * _capacity);
+				size_t newcapacity = _capacity == 0 ? 4 : 2 * _capacity;
+				reverse(newcapacity);
 			}
 			_str[_size] = ch;
 			_size++;
-			_capacity *= 2;
-		}
+			_str[_size] = '\0';
+		}*/
 		//尾插一个字符串
-		void append(char* str)
+		void append(const char* str)
 		{
-			if (_size + strlen(str) + 1 >= _capacity)
+			size_t len = strlen(str);
+			if (_size + len > _capacity)
 			{
-				reverse(strlen(str) + 1);
+				reverse(_size + len);
 			}
-			strcpy(_str + _size, str);
-			_size += strlen(str) + 1;
-			_capacity += strlen(str) + 1;
+			strcpy(_str, str);
+			_size +=len;
+		}
+		//s2.swap(s1)
+		void swap(string& s)
+		{
+			::swap(_str, s._str);
+			::swap(_size, s._size);
+			::swap(_capacity, s._capacity);
 		}
 
+		void operator+=(char ch)
+		{
+			push_back(ch);
+		}
+		void operator+=(char* str)
+		{
+			append(str);
+		}
+		char& operator[](size_t pos)
+		{
+			assert(pos < _size);
+			return _str[pos];
+		}
+		const char& operator[](size_t pos) const
+		{
+			assert(pos < _size);
+			return _str[pos];
+		}
+		//修改size并初始化
+		void resize(size_t n, char ch = '\0')
+		{
+			if (n <= _size)
+			{
+				_size = n;
+				_str[_size] = '\0';
+			}
+			else
+			{
+				if (n > _capacity)
+				{
+					reverse(n);
+				}
 
+				for (size_t i = _size; i < n; ++i)
+				{
+					_str[i] = ch;
+				}
+
+				_size = n;
+				_str[_size] = '\0';
+			}
+		}
+		//返回size
+		size_t size() const
+		{
+			return _size;
+		}
+		//打印
+		void print(const string& str)
+		{
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				cout << str[i] << ' ';
+			}
+			cout << endl;
+
+			const_interator it = str.begin();
+			while (it != str.end())
+			{
+				cout << *it << ' ';
+				++it;
+			}
+		}
+		//插入一个字符
+		void insert(size_t pos, char ch)
+		{
+			assert(pos <= _size);
+			if (_size == _capacity)
+			{
+				size_t newcapacity = _capacity == 0 ? 4 : _capacity * 2;
+				reverse(newcapacity);
+			}
+
+			/*int end = _size;
+			while (end >= (int)pos)
+			{
+				_str[end + 1] = _str[end];
+				--end;
+			}*/
+			//-1 
+			int end = _size + 1;
+			while (end > pos)
+			{
+				_str[end] = _str[end - 1];
+				--end;
+			}
+
+			_str[pos] = ch;
+			++_size;
+
+		}
+		//插入一个字符串
+		void insert(size_t pos, const char* str)
+		{
+			assert(pos <= _size);
+			size_t len = strlen(str);
+			if (len + _size > _capacity)
+			{
+				reverse(len + _size);
+			}
+
+			size_t end = _size + len;
+			while (end >= pos + len)
+			{
+				_str[end] = _str[end - len];
+				--end;
+			}
+
+			for (size_t i = 0; i < len; ++i)
+			{
+				_str[pos + i] = str[i];
+			}
+		}
+		//删除字符串里的内容
+		void erase(size_t pos, size_t len = npos)
+		{
+			assert(pos < _size);// = 不可以
+			if (len == npos || pos + len >= _size)
+			{
+				//1、pos位置后面的字符全部删除
+				_str[pos] = '\0';
+				_size = pos;
+			}
+			else
+			{
+				//2、pos位置后面的内容删除一部分
+				strcpy(_str + pos, _str + pos + len);
+				_size -= len;
+			}
+		}
+		void push_back(char ch)
+		{
+			insert(_size, ch);
+		}
+		
+		char* C_str() const
+		{
+			return _str;
+		}
 		//析构函数
 		~string()
 		{
@@ -231,14 +361,130 @@ namespace zsj
 		char* _str;
 		size_t _size;            //当前存放的有效数据的个数
 		size_t _capacity;        //当前能够存放的有效数据的个数
+
+		static size_t npos;
 	};
 
-	void TestString()
+//静态成员变量在全局位置定义初始化
+size_t string::npos = -1;
+
+ostream& operator<<(ostream& out, const string& s)
+{
+	for (size_t i = 0; i < s.size(); ++i)
+	{
+		cout << s[i];
+	}
+
+	return out;
+}
+
+istream& operator>>(istream& in, string& s)
+{
+	char ch;
+	//in >> ch;
+	ch = in.get();
+	while (ch != ' ' && ch != '\n')
+	{
+		s += ch;
+		//in >> ch;
+		ch = in.get();
+	}
+
+	return in;
+}
+	void TestString1()
 	{
 		char ch1[] = "hello";
-		char ch2[] = "world";
 		string s1(ch1);
-		s1.push_back(' ');
-		s1.append(ch2);
+
+		s1 += ' ';
+		char ch2[] = "world";
+		s1 += ch2;
+	}
+
+	void TestString2()
+	{
+		string s1;
+		s1 += 'y';
+		s1.resize(5, 'x');
+	}
+
+	void Teststring3()
+	{
+		//遍历 输出
+		char ch[] = "hello world";
+		string s1(ch);
+
+		for (size_t i = 0; i < s1.size(); ++i)
+		{
+			cout << s1[i] << ' ';
+		}
+		cout << endl;
+
+		string::interator it = s1.begin();
+		while (it != s1.end())
+		{
+			cout << *it << ' ';
+			++it;
+		}
+		cout << endl;
+
+		s1.print(s1);
+
+	}
+
+	void TestString4()
+	{
+		char ch[] = "hello";
+		string s1(ch);
+		s1.insert(1, 'x');
+		cout << s1.C_str() << endl;
+
+		s1.insert(0, 'z');
+	}
+
+	void TestString5()
+	{
+		char ch[] = "helloworld";
+		string s1(ch);
+		s1.insert(5, "bit");
+		cout << s1.C_str() << endl;
+	}
+
+	void TestString6()
+	{
+		char ch[] = "helloworld";
+		string s1(ch);
+		s1.erase(5, 3);
+		cout << s1.C_str() << endl;
+	}
+
+	void TestString7()
+	{
+		
+		string s1("hello world");
+		//cin >> s1;
+		cout << s1 << endl;
+		cout << s1.C_str() << endl;
+
+		cout << "-------------------------------" << endl;
+
+		string s2("hello world");
+		s2.resize(20);
+		s2[19] = 'x';
+
+		cout << s2 << endl;
+		cout << s2.C_str() << endl;
+		cout << "-------------------------------" << endl;
+
+		string s3;
+		cin >> s3;
+		cout << s3;
+
+
+	
 	}
 }
+
+
+
