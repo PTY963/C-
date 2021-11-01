@@ -345,11 +345,20 @@ namespace zsj
 		{
 			insert(_size, ch);
 		}
+
+		void clear()
+		{
+			_str[0] = '\0';
+			_size = 0;
+		}
 		
 		char* C_str() const
 		{
 			return _str;
 		}
+
+		
+		
 		//析构函数
 		~string()
 		{
@@ -380,6 +389,7 @@ ostream& operator<<(ostream& out, const string& s)
 
 istream& operator>>(istream& in, string& s)
 {
+	s.clear();
 	char ch;
 	//in >> ch;
 	ch = in.get();
@@ -391,6 +401,88 @@ istream& operator>>(istream& in, string& s)
 	}
 
 	return in;
+}
+istream& getline(istream& in, string& s)
+{
+	s.clear();
+	char ch;
+	//in >> ch;
+	ch = in.get();
+	while (ch != '\n')
+	{
+		s += ch;
+		//in >> ch;
+		ch = in.get();
+	}
+
+	return in;
+}
+
+bool operator>(const string& s1, const string& s2)
+{
+	size_t i1 = 0, i2 = 0;
+	while (i1 < s1.size() && i2 < s2.size())
+	{
+		if (s1[i1] > s2[i2])
+			return true;
+		else if (s1[i1] < s2[i2])
+			return false;
+		else
+		{
+			++i1;
+			++i2;
+		}
+	}
+	//程序走到这儿，说明有一个走到了结尾或者两个都走到了结尾
+	//"abc" "abc"  false
+	//"ab" "abc"   false
+	//"abc" "ab"   true
+	if (i1 == s1.size())
+		return false;
+	else
+		return true;
+}
+bool operator== (const string & s1, const string & s2)
+{
+	size_t i1 = 0, i2 = 0;
+	while (i1 < s1.size() && i2 < s2.size())
+	{
+		if (s1[i1] != s2[i2])
+			return false;
+		else
+		{
+			++i1;
+			++i2;
+		}
+	}
+
+	if (i1 == i2)
+		return true;
+	else
+		return false;
+}
+inline bool operator!=(const string& s1, const string& s2)
+{
+	return !(s1 == s2);
+}
+inline bool operator>=(const string& s1, const string& s2)
+{
+	return s1 > s2 || s1 == s2;
+}
+inline bool operator<(const string& s1, const string& s2)
+{
+	return !(s1 >= s2);
+}
+inline bool operator<=(const string& s1, const string& s2)
+{
+	return !(s1 > s2);
+}
+//两次深拷贝
+string operator+(const string& s, char* str)
+{
+	string ret = s;
+	ret += str;
+	return ret;
 }
 	void TestString1()
 	{
@@ -481,8 +573,13 @@ istream& operator>>(istream& in, string& s)
 		cin >> s3;
 		cout << s3;
 
+	}
 
-	
+	void TestString8()
+	{
+		string s1("hello world");
+		getline(cin, s1);
+		cout << s1 << endl;
 	}
 }
 
