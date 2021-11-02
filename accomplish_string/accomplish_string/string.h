@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
+#include <stdio.h>
 using namespace std;
 //深浅拷贝
 
@@ -356,7 +357,27 @@ namespace zsj
 		{
 			return _str;
 		}
+		//查找
+		size_t find(const char ch, size_t pos = 0)
+		{
+			for (size_t i = pos; i < _size; ++i)
+			{
+				if (_str[i] == ch)
+					return i;
+			}
 
+			return npos;
+		}
+		size_t find(const char* sub, size_t pos = 0)
+		{
+			const char* p = strstr(_str + pos, sub);
+			if (p == NULL)
+				return npos;
+			else
+				return p - _str;
+		}
+		//hello world
+		//wor
 		
 		
 		//析构函数
@@ -367,6 +388,7 @@ namespace zsj
 			_size = _capacity = 0;
 		}
 	private:
+		char buff[16];//字符串长度小于16都存在buff中，大于16存在_str指向的堆空间中 - VS
 		char* _str;
 		size_t _size;            //当前存放的有效数据的个数
 		size_t _capacity;        //当前能够存放的有效数据的个数
