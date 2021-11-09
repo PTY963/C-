@@ -126,8 +126,6 @@ namespace std
 
 int main()
 {
-	//std::Test1();
-	/*std::Test2();*/
-	std::Test5();
+	zsj::Test4();
 	return 0;
 }
