@@ -126,6 +126,6 @@ namespace std
 
 int main()
 {
-	zsj::Test4();
+	zsj::Test5();
 	return 0;
 }

@@ -30,26 +30,26 @@ namespace zsj
 		{}
 
 		//拷贝构造传统写法
-		vector(const vector<T>& v)
-		{
-			//1、开辟一块和v一样大的空间
-			_start = new T[v.capacity()];
-			//2、将v空间的内容拷贝过来
-			memcpy(_start, v._start, sizeof(T) * v.size());
-			//3、修改初始值
-			_finsh = _start + v.size();
-			_end_of_storage = _start + v.capacity();
-		}
+		//vector(const vector<T>& v)
+		//{
+		//	//1、开辟一块和v一样大的空间
+		//	_start = new T[v.capacity()];
+		//	//2、将v空间的内容拷贝过来
+		//	memcpy(_start, v._start, sizeof(T) * v.size());//T如果是像string这样的类型会出问题
+		//	//3、修改初始值
+		//	_finsh = _start + v.size();
+		//	_end_of_storage = _start + v.capacity();
+		//}
 
 		//现代写法的拷贝构造函数
-		/*vector(const vector<T>& v)
+		vector(const vector<T>& v)
 			:_start(nullptr)
 			,_finsh(nullptr)
 			,_end_of_storage(nullptr)
 		{
 			vector<T> temp(v.begin(), v.end());
 			swap(temp);
-		}*/
+		}
 
 		void swap(vector<T>& v)
 		{
@@ -59,7 +59,7 @@ namespace zsj
 		}
 		
 		//类模板的成员函数，还可以定义模板参数
-		/*template<class InputIterator>
+		template<class InputIterator>
 		vector(InputIterator first, InputIterator last)
 			:_start(nullptr)
 			,_finsh(nullptr)
@@ -70,7 +70,7 @@ namespace zsj
 				push_back(*first);
 				++first;
 			}
-		}*/
+		}
 
 		//v1 = v2
 		//vector<T>& operator=(const vector<T>& v)
@@ -140,8 +140,16 @@ namespace zsj
 			if (n > capacity())
 			{
 				size_t sz = size();
-				T* tmp = new T[n];//给tmp开辟一块空间
-				memcpy(tmp, _start, sizeof(T) * sz);//将原先空间的内容拷贝到tmp中
+				T* tmp = new T[n];
+				//memcpy会造成更深层次的浅拷贝
+				//memcpy(tmp, _start, sizeof(T) * sz);
+				for (size_t i = 0; i < sz; ++i)
+				{
+					//string的赋值重载实现的是深层次的拷贝-开辟一样大的空间再将内容拷贝过去
+					
+					tmp[i] = _start[i];
+				}
+				delete[] _start;
 				_start = tmp;
 				_finsh = _start + sz;
 				_end_of_storage = _start + n;
@@ -181,7 +189,7 @@ namespace zsj
 			if (_finsh == _end_of_storage)
 			{
 				size_t len = pos - _start;
-				int newcapcity = capacity() == 0 ? 4 : capacity();
+				int newcapcity = capacity() == 0 ? 4 : 2*capacity();
 				reverse(newcapcity);
 				pos = _start + len;
 			}
@@ -332,6 +340,25 @@ namespace zsj
 		}
 		cout << endl; 
 
+	}
+	void Test5()
+	{
+		vector<string> v1;
+		v1.push_back("1111");
+		v1.push_back("1111");
+		v1.push_back("1111");
+		v1.push_back("1111");
+		v1.push_back("1111");
+
+		
+
+		vector<string>::iterator it = v1.begin();
+		while (it != v1.end())
+		{
+			cout << *it << ' ';
+			++it;
+		}
+		cout << endl;
 	}
 
 }
