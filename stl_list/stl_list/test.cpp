@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <functional>
 #include <algorithm>
 using namespace std;
 #include "list.h"
@@ -96,8 +97,79 @@ namespace std
 		//erase之后，迭代器会失效，因为pos位置的结点被释放，pos成为野指针
 		//对野指针的访问是错误的
 		cout << *pos << endl;
+	}
 
+	void test4()
+	{
+		list<int> v1;
+		v1.push_back(1);
+		v1.push_back(2);
+		v1.push_back(3);
+		v1.push_back(4);
 
+		list<int>::iterator it = v1.begin();
+		while (it != v1.end())
+		{
+			cout << *it << ' ';
+			++it;
+		}
+		cout << endl;
+		cout << "-----------------------------------" << endl;
+
+		v1.clear();//清除所有有效数据
+		v1.push_back(10);
+		v1.push_back(20);
+		v1.push_back(30);
+		v1.push_back(40);
+		it = v1.begin();
+		while (it != v1.end())
+		{
+			cout << *it << ' ';
+			++it;
+		}
+
+	}
+
+	void test5()
+	{
+		list<int> lt1;
+		lt1.push_back(10);
+		lt1.push_back(5);
+		lt1.push_back(12);
+		lt1.push_back(27);
+		lt1.push_back(12);
+		lt1.push_back(12);
+		lt1.push_back(12);
+
+		list<int>::iterator it = lt1.begin();
+		while (it != lt1.end())
+		{
+			cout << *it << ' ';
+			++it;
+		}
+		cout << endl;
+
+		//默认排升序
+		//lt1.sort();
+		lt1.sort(greater<int> ());
+		for (auto& e : lt1)
+		{
+			cout << e << ' ';
+		}
+		cout << endl;
+
+		/*lt1.unique();
+		for (auto& e : lt1)
+		{
+			cout << e << ' ';
+		}
+		cout << endl;*/
+		lt1.remove(12);
+		for (auto& e : lt1)
+		{
+			cout << e << ' ';
+		}
+		cout << endl;
 
 	}
 }
@@ -105,7 +177,10 @@ namespace std
 int main()
 {
 	//test3();
-	zsj::Test1();
+	//zsj::Test1();
+	//std::test4();
+	//std::test5();
+	zsj::test2();
 	return 0;
 }
 
