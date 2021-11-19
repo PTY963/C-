@@ -2,8 +2,10 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <string>
 #include <functional>
 #include <algorithm>
+#include <assert.h>
 using namespace std;
 #include "list.h"
 
@@ -180,7 +182,10 @@ int main()
 	//zsj::Test1();
 	//std::test4();
 	//std::test5();
-	zsj::test2();
+	//zsj::test2();
+	//zsj::test3();
+	//zsj::test4();
+	zsj::test5();
 	return 0;
 }
 
